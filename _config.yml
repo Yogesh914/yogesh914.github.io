@@ -26,8 +26,8 @@ author:
   avatar           : "profile.jpeg"
   name             : "Yogesh Prabhu"
   pronouns         : # example: "she/her"  
-  bio              : "Short biography for the left-hand sidebar"
-  location         : "Earth"
+  bio              : ""
+  location         : "San Diego, CA"
   employer         : "University of California, San Diego"
   uri              : # URL
   email            : "yprabhu@ucsd.edu" 
