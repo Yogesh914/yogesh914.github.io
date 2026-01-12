@@ -8,14 +8,119 @@ redirect_from:
 ---
 
 {% include base_path %}
+
+<style>
+  .twitter-posts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .twitter-posts-list li {
+    margin-bottom: 15px;
+    padding: 15px;
+    border-left: 3px solid #1DA1F2;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+  }
+
+  .twitter-posts-list li:hover {
+    background: #e9ecef;
+    border-left-width: 5px;
+  }
+
+  .twitter-posts-list a {
+    font-size: 1.1em;
+    text-decoration: none;
+    color: #1DA1F2;
+    font-weight: 500;
+  }
+
+  .twitter-posts-list a:hover {
+    text-decoration: underline;
+  }
+
+  .post-date {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-left: 10px;
+  }
+
+  .twitter-embed-container {
+    margin-top: 10px;
+    display: none;
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .twitter-embed-container.show {
+    display: block;
+  }
+</style>
+
 <ul class="twitter-posts-list">
 {% for post in site.posts %}
   <li>
     {% if post.twitter_link %}
-      <a href="{{ post.twitter_link }}" target="_blank" rel="noopener noreferrer">{{ post.title }}</a>
+      <div>
+        <a href="{{ post.twitter_link }}" target="_blank" rel="noopener noreferrer" class="twitter-post-link" data-tweet-url="{{ post.twitter_link }}">
+          {{ post.title }}
+        </a>
+        <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+        <div class="twitter-embed-container" id="embed-{{ forloop.index }}"></div>
+      </div>
     {% else %}
       <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ post.title }}</a>
+      <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
     {% endif %}
   </li>
 {% endfor %}
 </ul>
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const twitterLinks = document.querySelectorAll('.twitter-post-link');
+
+  twitterLinks.forEach((link, index) => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const container = document.getElementById('embed-' + (index + 1));
+
+      if (container.classList.contains('show')) {
+        container.classList.remove('show');
+        container.innerHTML = '';
+      } else {
+        // Hide all other embeds
+        document.querySelectorAll('.twitter-embed-container').forEach(c => {
+          c.classList.remove('show');
+          c.innerHTML = '';
+        });
+
+        // Show this embed
+        container.classList.add('show');
+        const tweetUrl = this.getAttribute('data-tweet-url');
+
+        // Extract tweet ID from URL
+        const tweetId = tweetUrl.match(/status\/(\d+)/)[1];
+
+        // Create embedded tweet
+        if (window.twttr) {
+          window.twttr.widgets.createTweet(
+            tweetId,
+            container,
+            {
+              conversation: 'none',
+              cards: 'visible',
+              theme: 'light'
+            }
+          );
+        }
+      }
+    });
+  });
+});
+</script>
